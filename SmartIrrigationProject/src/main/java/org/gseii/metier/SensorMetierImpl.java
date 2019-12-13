@@ -37,19 +37,30 @@ public class SensorMetierImpl implements SensorMetier {
 	@Override
 	public Sensor saveValue(short idSensor, double value) {
 		return sensorRepository.findById(idSensor).map(s -> {
-			s.setValueOfHour(value, s.getActualHour());
+
+			////////////////////////////////////////////////////
+			// s.setValueOfHour(value, s.getActualHour());
+			////////////////////////////////////////////////////
+
 			// Changing the value of min & max and avg of the day
 
 			List<Double> values = s.getValuesOfDay();
 			int day = s.getActualDay();
 			int hour = s.getActualHour();
 
-			double max = s.getMaxOfDay(day);
-			double min = s.getMinOfDay(day);
-			double sum = 0;
-
-			if (hour != 0) {
-				for (int i = 0; i < hour; i++) {
+			/////////////////////////////////////////////////////////////
+			if (hour == 0) {
+				values.clear();
+				values.add(value);
+				s.setValuesOfDay(values);
+			} else if (hour == 23){
+				double max = value;
+				double min = value;
+				double sum = value;
+				List<Double> mins = s.getMinOfWeek();
+				List<Double> maxs = s.getMaxOfWeek();
+				List<Double> avgs = s.getAvgOfWeek();
+				for (int i = 0; i < 23; i++) {
 					sum += values.get(i);
 					if (values.get(i) > max) {
 						max = values.get(i);
@@ -58,15 +69,39 @@ public class SensorMetierImpl implements SensorMetier {
 						min = values.get(i);
 					}
 				}
-			} else {
-				min = value;
-				max = value;
+				if(day>0) {
+					mins.add(min);
+					s.setMinOfWeek(mins);
+					maxs.add(max);
+					s.setMaxOfWeek(maxs);
+					avgs.add(sum/24);
+					s.setAvgOfWeek(avgs);
+				}else {
+					mins.clear();
+					mins.add(min);
+					s.setMinOfWeek(mins);
+					maxs.clear();
+					maxs.add(max);
+					s.setMaxOfWeek(maxs);
+					avgs.clear();
+					avgs.add(sum/24);
+					s.setAvgOfWeek(avgs);
+				}
+	
+			}else{
+				values.add(value);
+				s.setValuesOfDay(values);
 			}
-
-			s.setAvgOfDay((sum / hour), day);
-			s.setMinOfDay(min, day);
-			s.setMaxOfDay(max, day);
-
+			
+			/////////////////////////////////////////////////////////////
+			/*
+			 * if (hour != 0) { for (int i = 0; i < hour; i++) { sum += values.get(i); if
+			 * (values.get(i) > max) { max = values.get(i); } if (values.get(i) < min) { min
+			 * = values.get(i); } } } else { min = value; max = value; }
+			 * 
+			 * s.setAvgOfDay((sum / hour), day); s.setMinOfDay(min, day); s.setMaxOfDay(max,
+			 * day);
+			 */
 			// Increment the hour & day
 			hour = (hour + 1) % 24;
 			s.setActualHour(hour);

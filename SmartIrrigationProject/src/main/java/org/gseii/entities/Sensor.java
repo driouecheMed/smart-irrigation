@@ -45,14 +45,14 @@ public class Sensor implements Serializable {
 	public Sensor(String nomSensor) {
 		super();
 		this.nomSensor = nomSensor;
-		for (int i = 0; i < 24; i++) {
+		/*for (int i = 0; i < 24; i++) {
 			this.valuesOfDay.add(0.0);
 		}
 		for (int i = 0; i < 7; i++) {
 			this.maxOfWeek.add(0.0);
 			this.minOfWeek.add(0.0);
 			this.avgOfWeek.add(0.0);
-		}
+		}*/
 		this.actualHour = 0;
 		this.actualDay = 0;
 	}
