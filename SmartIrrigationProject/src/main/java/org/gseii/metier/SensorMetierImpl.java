@@ -38,72 +38,40 @@ public class SensorMetierImpl implements SensorMetier {
 	public Sensor saveValue(short idSensor, double value) {
 		return sensorRepository.findById(idSensor).map(s -> {
 
-			////////////////////////////////////////////////////
-			// s.setValueOfHour(value, s.getActualHour());
-			////////////////////////////////////////////////////
-
 			// Changing the value of min & max and avg of the day
 
-			List<Double> values = s.getValuesOfDay();
 			int day = s.getActualDay();
 			int hour = s.getActualHour();
-
-			/////////////////////////////////////////////////////////////
-			if (hour == 0) {
-				values.clear();
-				values.add(value);
-				s.setValuesOfDay(values);
-			} else if (hour == 23){
+			if (hour == 7) {
 				double max = value;
 				double min = value;
 				double sum = value;
-				List<Double> mins = s.getMinOfWeek();
-				List<Double> maxs = s.getMaxOfWeek();
-				List<Double> avgs = s.getAvgOfWeek();
-				for (int i = 0; i < 23; i++) {
-					sum += values.get(i);
-					if (values.get(i) > max) {
-						max = values.get(i);
+				for (int i = 0; i < 7; i++) {
+					sum += s.getValuesOfDay().get(i);
+					if (s.getValuesOfDay().get(i) > max) {
+						max = s.getValuesOfDay().get(i);
 					}
-					if (values.get(i) < min) {
-						min = values.get(i);
+					if (s.getValuesOfDay().get(i) < min) {
+						min = s.getValuesOfDay().get(i);
 					}
 				}
-				if(day>0) {
-					mins.add(min);
-					s.setMinOfWeek(mins);
-					maxs.add(max);
-					s.setMaxOfWeek(maxs);
-					avgs.add(sum/24);
-					s.setAvgOfWeek(avgs);
-				}else {
-					mins.clear();
-					mins.add(min);
-					s.setMinOfWeek(mins);
-					maxs.clear();
-					maxs.add(max);
-					s.setMaxOfWeek(maxs);
-					avgs.clear();
-					avgs.add(sum/24);
-					s.setAvgOfWeek(avgs);
-				}
-	
-			}else{
-				values.add(value);
-				s.setValuesOfDay(values);
+				s.getMinOfWeek().removeFirst();
+				s.getMinOfWeek().add(min);
+				s.getMaxOfWeek().removeFirst();
+				s.getMaxOfWeek().add(max);
+				s.getAvgOfWeek().removeFirst();
+				s.getAvgOfWeek().add(sum / 8);
 			}
 			
-			/////////////////////////////////////////////////////////////
-			/*
-			 * if (hour != 0) { for (int i = 0; i < hour; i++) { sum += values.get(i); if
-			 * (values.get(i) > max) { max = values.get(i); } if (values.get(i) < min) { min
-			 * = values.get(i); } } } else { min = value; max = value; }
-			 * 
-			 * s.setAvgOfDay((sum / hour), day); s.setMinOfDay(min, day); s.setMaxOfDay(max,
-			 * day);
-			 */
+			if(hour==0) {
+				for(int i = 1;i<8;i++) {
+					s.setValueOfHour(0.0, i);
+				}
+			}
+			
+			s.setValueOfHour(value, hour);
 			// Increment the hour & day
-			hour = (hour + 1) % 24;
+			hour = (hour + 1) % 8;
 			s.setActualHour(hour);
 			if (hour == 0) {
 				// new day
@@ -114,7 +82,6 @@ public class SensorMetierImpl implements SensorMetier {
 		}).orElseGet(() -> {
 			return null;
 		});
-
 	}
 
 	@Override

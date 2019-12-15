@@ -1,15 +1,14 @@
 package org.gseii.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -25,18 +24,15 @@ public class Sensor implements Serializable {
 	private int actualHour;
 	@Column(length = 1)
 	private int actualDay;
-	@ElementCollection
+	@Lob
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<Double> valuesOfDay = new ArrayList<>(24);
-	@ElementCollection
+	private LinkedList<Double> valuesOfDay = new LinkedList<Double>();
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<Double> minOfWeek = new ArrayList<>(7);
-	@ElementCollection
+	private LinkedList<Double> minOfWeek = new LinkedList<Double>();
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<Double> maxOfWeek = new ArrayList<>(7);
-	@ElementCollection
+	private LinkedList<Double> maxOfWeek = new LinkedList<Double>();
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<Double> avgOfWeek = new ArrayList<>(7);
+	private LinkedList<Double> avgOfWeek = new LinkedList<Double>();
 
 	public Sensor() {
 		super();
@@ -45,14 +41,13 @@ public class Sensor implements Serializable {
 	public Sensor(String nomSensor) {
 		super();
 		this.nomSensor = nomSensor;
-		/*for (int i = 0; i < 24; i++) {
+		this.valuesOfDay.add(0.0);
+		for(int i = 0;i<7;i++) {
 			this.valuesOfDay.add(0.0);
-		}
-		for (int i = 0; i < 7; i++) {
-			this.maxOfWeek.add(0.0);
 			this.minOfWeek.add(0.0);
+			this.maxOfWeek.add(0.0);
 			this.avgOfWeek.add(0.0);
-		}*/
+		}
 		this.actualHour = 0;
 		this.actualDay = 0;
 	}
@@ -89,11 +84,11 @@ public class Sensor implements Serializable {
 		this.actualDay = actualDay;
 	}
 
-	public List<Double> getValuesOfDay() {
+	public LinkedList<Double> getValuesOfDay() {
 		return valuesOfDay;
 	}
 
-	public void setValuesOfDay(List<Double> valuesOfDay) {
+	public void setValuesOfDay(LinkedList<Double> valuesOfDay) {
 		this.valuesOfDay = valuesOfDay;
 	}
 
@@ -101,7 +96,7 @@ public class Sensor implements Serializable {
 		this.valuesOfDay.set(hour, value);
 	}
 
-	public List<Double> getMinOfWeek() {
+	public LinkedList<Double> getMinOfWeek() {
 		return minOfWeek;
 	}
 
@@ -109,7 +104,7 @@ public class Sensor implements Serializable {
 		return minOfWeek.get(day);
 	}
 
-	public void setMinOfWeek(List<Double> minOfWeek) {
+	public void setMinOfWeek(LinkedList<Double> minOfWeek) {
 		this.minOfWeek = minOfWeek;
 	}
 
@@ -117,7 +112,7 @@ public class Sensor implements Serializable {
 		this.minOfWeek.set(day, min);
 	}
 
-	public List<Double> getMaxOfWeek() {
+	public LinkedList<Double> getMaxOfWeek() {
 		return maxOfWeek;
 	}
 
@@ -125,7 +120,7 @@ public class Sensor implements Serializable {
 		return maxOfWeek.get(day);
 	}
 
-	public void setMaxOfWeek(List<Double> maxOfWeek) {
+	public void setMaxOfWeek(LinkedList<Double> maxOfWeek) {
 		this.maxOfWeek = maxOfWeek;
 	}
 
@@ -133,7 +128,7 @@ public class Sensor implements Serializable {
 		this.maxOfWeek.set(day, max);
 	}
 
-	public List<Double> getAvgOfWeek() {
+	public LinkedList<Double> getAvgOfWeek() {
 		return avgOfWeek;
 	}
 
@@ -141,7 +136,7 @@ public class Sensor implements Serializable {
 		return avgOfWeek.get(day);
 	}
 
-	public void setAvgOfWeek(List<Double> avgOfWeek) {
+	public void setAvgOfWeek(LinkedList<Double> avgOfWeek) {
 		this.avgOfWeek = avgOfWeek;
 	}
 
